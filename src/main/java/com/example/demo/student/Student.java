@@ -1,5 +1,6 @@
 package com.example.demo.student;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ public class Student {
     private Long id;
     private String name;
     private int age;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dob;
     private String email;
 
