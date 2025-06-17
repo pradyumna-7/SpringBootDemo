@@ -18,6 +18,13 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
+    public Student getStudentByEmail(String email) {
+        return studentRepository.findAll().stream()
+                .filter(student -> student.getEmail().equals(email))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Student not found with email: " + email));
+    }
+
     public Student addStudent(Student student) {
         return studentRepository.save(student);
     }

@@ -2,11 +2,13 @@ package com.example.demo.student;
 
 import com.example.demo.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -39,6 +41,30 @@ public class StudentController {
             Student savedStudent = studentService.addStudent(student);
             ApiResponse<Student> response = ApiResponse.success(savedStudent);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            ApiResponse<Student> response = ApiResponse.error("Failed to add student: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<?> addStudentWithDetails(
+            @RequestParam String name,
+            @RequestParam int age,
+            @RequestParam String dob,
+            @RequestParam String email) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            Student student = new Student(name, age, LocalDate.parse(dob, formatter), email);
+            try {
+                Student existingStudent = studentService.getStudentByEmail(email);
+                ApiResponse<Student> response = ApiResponse.error("Student with email " + email + " already exists");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            } catch (RuntimeException e) {
+                Student savedStudent = studentService.addStudent(student);
+                ApiResponse<Student> response = ApiResponse.success(savedStudent);
+                return new ResponseEntity<>(response, HttpStatus.CREATED);
+            }
         } catch (Exception e) {
             ApiResponse<Student> response = ApiResponse.error("Failed to add student: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
