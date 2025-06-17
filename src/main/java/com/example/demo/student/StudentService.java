@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentService {
@@ -18,11 +19,8 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
-    public Student getStudentByEmail(String email) {
-        return studentRepository.findAll().stream()
-                .filter(student -> student.getEmail().equals(email))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Student not found with email: " + email));
+    public Optional<Student> getStudentByEmail(String email) {
+        return studentRepository.findByEmail(email);
     }
 
     public Student addStudent(Student student) {

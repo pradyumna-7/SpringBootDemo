@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/v1/student")
@@ -56,15 +57,14 @@ public class StudentController {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             Student student = new Student(name, age, LocalDate.parse(dob, formatter), email);
-            try {
-                Student existingStudent = studentService.getStudentByEmail(email);
-                ApiResponse<Student> response = ApiResponse.error("Student with email " + email + " already exists");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            } catch (RuntimeException e) {
-                Student savedStudent = studentService.addStudent(student);
-                ApiResponse<Student> response = ApiResponse.success(savedStudent);
-                return new ResponseEntity<>(response, HttpStatus.CREATED);
+            Optional<Student> studentByEmail = studentService.getStudentByEmail(email);
+            if(studentByEmail.isPresent()) {
+                ApiResponse<Student> response = ApiResponse.error("Student with email " + email + " already exists.");
+                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
             }
+            Student savedStudent = studentService.addStudent(student);
+            ApiResponse<Student> response = ApiResponse.success(savedStudent);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             ApiResponse<Student> response = ApiResponse.error("Failed to add student: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
