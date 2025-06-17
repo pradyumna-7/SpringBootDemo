@@ -1,5 +1,6 @@
 package com.example.demo.student;
 
+import com.example.demo.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,13 +24,28 @@ public class StudentController {
     }
 
     @GetMapping
-    public List<Student> getStudents() {
-        return studentService.getStudents();
+    public ResponseEntity<ApiResponse<List<Student>>> getStudents() {
+        try{
+            List<Student> students = studentService.getStudents();
+            ApiResponse<List<Student>> response = ApiResponse.success(students);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            ApiResponse<List<Student>> response = ApiResponse.error("Failed to fetch students: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
+
     @PostMapping
-    public ResponseEntity<Student> addStudent(@RequestBody Student student) {
-        Student savedStudent = studentService.addStudent(student);
-        return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<Student>> addStudent(@RequestBody Student student) {
+        try{
+            Student savedStudent = studentService.addStudent(student);
+            ApiResponse<Student> response = ApiResponse.success(savedStudent);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            ApiResponse<Student> response = ApiResponse.error("Failed to add student: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
