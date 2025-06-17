@@ -25,5 +25,8 @@ public class StudentService {
     public List<Student> getStudentsGreaterThanAge(int age) {
         return studentRepository.findByAgeGreaterThan(age);
     }
-    
+
+    public List<Student> findNameLike(String prefix) {
+        return studentRepository.findNameLike(prefix);
+    }
 }

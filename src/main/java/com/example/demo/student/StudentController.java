@@ -56,4 +56,18 @@ public class StudentController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/name-like/{prefix}")
+    public ResponseEntity<ApiResponse<List<Student>>> findNameLike(@PathVariable String prefix){
+        try{
+            List<Student> students = studentService.findNameLike(prefix);
+            ApiResponse<List<Student>> response = ApiResponse.success(students);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            ApiResponse<List<Student>> response = ApiResponse.error("Failed to fetch students: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }
