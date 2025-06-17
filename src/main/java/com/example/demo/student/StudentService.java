@@ -21,5 +21,9 @@ public class StudentService {
     public Student addStudent(Student student) {
         return studentRepository.save(student);
     }
+
+    public List<Student> getStudentsGreaterThanAge(int age) {
+        return studentRepository.findByAgeGreaterThan(age);
+    }
     
 }
